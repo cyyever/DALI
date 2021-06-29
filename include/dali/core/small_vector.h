@@ -249,6 +249,9 @@ class SmallVector : SmallVectorAlloc<T, allocator>, SmallVectorBase<T> {
   DALI_NO_EXEC_CHECK
   DALI_HOST_DEV void copy_assign(const T *data, size_t count) {
     clear();
+    if (!data && count == 0) {
+      return;
+    }
     reserve(count);
     T *ptr = this->data();
     if (std::is_pod<T>::value) {
