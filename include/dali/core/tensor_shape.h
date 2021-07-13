@@ -921,7 +921,7 @@ TensorListShape<other_ndim> TensorListShapeBase<Derived, sample_ndim>::first() c
          "Number of dimensions in subshape must be between 0 and sample_dim()");
   TensorListShape<other_ndim> result;
   result.resize(size());
-  for (int sample = 0; sample < size(); sample++) {
+  for (int sample = 0; sample < dali::size(); sample++) {
     for (int d = 0; d < other_ndim; d++) {
       result.shapes[sample * other_ndim + d] = shapes[sample * sample_dim() + d];
     }
@@ -940,7 +940,7 @@ TensorListShape<other_ndim> TensorListShapeBase<Derived, sample_ndim>::last() co
   TensorListShape<other_ndim> result;
   result.resize(size());
   int start_offset = sample_dim() - other_ndim;
-  for (int sample = 0; sample < size(); sample++) {
+  for (int sample = 0; sample < dali::size(); sample++) {
     for (int d = 0; d < other_ndim; d++) {
       result.shapes[sample * other_ndim + d] = shapes[sample * sample_dim() + start_offset + d];
     }
@@ -955,7 +955,7 @@ TensorListShapeBase<Derived, sample_ndim>::first(int count) const {
          "Number of dimensions in subshape must be between 0 and sample_dim()");
   TensorListShape<DynamicDimensions> result;
   result.resize(size(), count);
-  for (int sample = 0; sample < size(); sample++) {
+  for (int sample = 0; sample < dali::size(); sample++) {
     for (int d = 0; d < count; d++) {
       result.shapes[sample * count + d] = shapes[sample * sample_dim() + d];
     }
@@ -971,7 +971,7 @@ TensorListShapeBase<Derived, sample_ndim>::last(int count) const {
   TensorListShape<DynamicDimensions> result;
   result.resize(size(), count);
   int start_offset = sample_dim() - count;
-  for (int sample = 0; sample < size(); sample++) {
+  for (int sample = 0; sample < dali::size(); sample++) {
     for (int d = 0; d < count; d++) {
       result.shapes[sample * count + d] = shapes[sample * sample_dim() + start_offset + d];
     }
@@ -1363,14 +1363,14 @@ template <int out_ndim, int ndim>
 void collapse_dims(TensorListShape<out_ndim> &result,
                    const TensorListShape<ndim> &shape,
                    std::initializer_list<std::pair<int, int>> dim_groups) {
-  collapse_dims<out_ndim>(result, shape, make_span(dim_groups.begin(), size(dim_groups)));
+  collapse_dims<out_ndim>(result, shape, make_span(dim_groups.begin(), dali::size(dim_groups)));
 }
 
 template <int out_ndim = DynamicDimensions, int ndim>
 TensorListShape<out_ndim> collapse_dims(const TensorListShape<ndim> &shape,
                                         std::initializer_list<std::pair<int, int>> dim_groups) {
   TensorListShape<out_ndim> result;
-  collapse_dims<out_ndim>(result, shape, make_span(dim_groups.begin(), size(dim_groups)));
+  collapse_dims<out_ndim>(result, shape, make_span(dim_groups.begin(), dali::size(dim_groups)));
   return result;
 }
 
