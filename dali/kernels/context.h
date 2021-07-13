@@ -135,15 +135,15 @@ class Scratchpad {
   template <typename Collection, typename T = std::remove_const_t<element_t<Collection>>>
   if_array_like<Collection, T*>
   ToGPU(cudaStream_t stream, const Collection &c) {
-    T *ptr = AllocateGPU<T>(size(c));
-    CUDA_CALL(cudaMemcpyAsync(ptr, &c[0], size(c) * sizeof(T), cudaMemcpyHostToDevice, stream));
+    T *ptr = AllocateGPU<T>(dali::size(c));
+    CUDA_CALL(cudaMemcpyAsync(ptr, &c[0], dali::size(c) * sizeof(T), cudaMemcpyHostToDevice, stream));
     return ptr;
   }
 
   template <typename Collection, typename T = std::remove_const_t<element_t<Collection>>>
   if_iterable<Collection, T*>
   ToHost(const Collection &c) {
-    T *ptr = AllocateHost<T>(size(c));
+    T *ptr = AllocateHost<T>(dali::size(c));
     std::copy(begin(c), end(c), ptr);
     return ptr;
   }
@@ -151,7 +151,7 @@ class Scratchpad {
   template <typename Collection, typename T = std::remove_const_t<element_t<Collection>>>
   if_iterable<Collection, T*>
   ToPinned(const Collection &c) {
-    T *ptr = AllocatePinned<T>(size(c));
+    T *ptr = AllocatePinned<T>(dali::size(c));
     std::copy(begin(c), end(c), ptr);
     return ptr;
   }
@@ -159,7 +159,7 @@ class Scratchpad {
   template <typename Collection, typename T = std::remove_const_t<element_t<Collection>>>
   if_iterable<Collection, T*>
   ToManaged(const Collection &c) {
-    T *ptr = AllocateManaged<T>(size(c));
+    T *ptr = AllocateManaged<T>(dali::size(c));
     std::copy(begin(c), end(c), ptr);
     return ptr;
   }
