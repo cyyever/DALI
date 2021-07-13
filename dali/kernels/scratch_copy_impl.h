@@ -59,7 +59,7 @@ void GetCollectionOffsets(size_t base, size_t *offsets,
   using T = std::remove_cv_t<element_t<Collection>>;
   base = align_up(base, alignof(T));
   *offsets = base;
-  base += size(c) * sizeof(T);
+  base += dali::size(c) * sizeof(T);
   GetCollectionOffsets(base, offsets + 1, tail...);
 }
 
