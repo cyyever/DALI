@@ -59,7 +59,7 @@ inline DaliProtoPriv * SerializeToProtobuf(const type& t, DaliProtoPriv *arg) { 
 
 SERIALIZE_ARGUMENT(int64, ints);
 SERIALIZE_ARGUMENT(float, floats);
-SERIALIZE_ARGUMENT(double, doubles);
+SERIALIZE_ARGUMENT(double, floats);
 SERIALIZE_ARGUMENT(bool, bools);
 SERIALIZE_ARGUMENT(string, strings);
 
