@@ -921,7 +921,7 @@ TensorListShape<other_ndim> TensorListShapeBase<Derived, sample_ndim>::first() c
          "Number of dimensions in subshape must be between 0 and sample_dim()");
   TensorListShape<other_ndim> result;
   result.resize(size());
-  for (int sample = 0; sample < dali::size(); sample++) {
+  for (int sample = 0; sample < size(); sample++) {
     for (int d = 0; d < other_ndim; d++) {
       result.shapes[sample * other_ndim + d] = shapes[sample * sample_dim() + d];
     }
@@ -940,7 +940,7 @@ TensorListShape<other_ndim> TensorListShapeBase<Derived, sample_ndim>::last() co
   TensorListShape<other_ndim> result;
   result.resize(size());
   int start_offset = sample_dim() - other_ndim;
-  for (int sample = 0; sample < dali::size(); sample++) {
+  for (int sample = 0; sample < size(); sample++) {
     for (int d = 0; d < other_ndim; d++) {
       result.shapes[sample * other_ndim + d] = shapes[sample * sample_dim() + start_offset + d];
     }
@@ -955,7 +955,7 @@ TensorListShapeBase<Derived, sample_ndim>::first(int count) const {
          "Number of dimensions in subshape must be between 0 and sample_dim()");
   TensorListShape<DynamicDimensions> result;
   result.resize(size(), count);
-  for (int sample = 0; sample < dali::size(); sample++) {
+  for (int sample = 0; sample < size(); sample++) {
     for (int d = 0; d < count; d++) {
       result.shapes[sample * count + d] = shapes[sample * sample_dim() + d];
     }
@@ -971,7 +971,7 @@ TensorListShapeBase<Derived, sample_ndim>::last(int count) const {
   TensorListShape<DynamicDimensions> result;
   result.resize(size(), count);
   int start_offset = sample_dim() - count;
-  for (int sample = 0; sample < dali::size(); sample++) {
+  for (int sample = 0; sample < size(); sample++) {
     for (int d = 0; d < count; d++) {
       result.shapes[sample * count + d] = shapes[sample * sample_dim() + start_offset + d];
     }
