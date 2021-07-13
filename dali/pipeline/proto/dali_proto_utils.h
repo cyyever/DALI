@@ -38,6 +38,10 @@ inline std::string serialize_type(const float&) {
   return "float";
 }
 
+inline std::string serialize_type(const double&) {
+  return "double";
+}
+
 template<typename T>
 inline auto serialize_type(const T& t)
   -> decltype(t.SerializeType()) {
