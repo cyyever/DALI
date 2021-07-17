@@ -114,7 +114,7 @@ class DLL_PUBLIC MTTransformAttr {
 
   template <typename OutRange, typename InRange>
   void Repeat(OutRange &&out, InRange &&in, int times) {
-    ssize_t n = size(in);
+    ssize_t n = dali::size(in);
     resize_if_possible(out, n * times);
     for (ssize_t i = 0, k = 0; i < times; i++)
       for (ssize_t j = 0; j < n; j++, k++)
