@@ -612,11 +612,11 @@ constexpr vec<sizeof...(indices), T> shuffle(const vec<N, T> &v) {
   return { v[indices]... };
 }
 
-static_assert(std::is_standard_layout<vec<1>>::value, "vec<1, T> must be a POD type");
-static_assert(std::is_standard_layout<vec<2>>::value, "vec<2, T> must be a POD type");
-static_assert(std::is_standard_layout<vec<3>>::value, "vec<3, T> must be a POD type");
-static_assert(std::is_standard_layout<vec<4>>::value, "vec<4, T> must be a POD type");
-static_assert(std::is_standard_layout<vec<5>>::value, "vec<N, T> must be a POD type");
+static_assert(std::is_pod<vec<1>>::value, "vec<1, T> must be a POD type");
+static_assert(std::is_pod<vec<2>>::value, "vec<2, T> must be a POD type");
+static_assert(std::is_pod<vec<3>>::value, "vec<3, T> must be a POD type");
+static_assert(std::is_pod<vec<4>>::value, "vec<4, T> must be a POD type");
+static_assert(std::is_pod<vec<5>>::value, "vec<N, T> must be a POD type");
 
 template <int N, typename T>
 std::ostream &operator<<(std::ostream& os, const dali::vec<N, T> &v) {
