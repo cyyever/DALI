@@ -77,7 +77,6 @@ void ToDecibels<CPUBackend>::RunImpl(workspace_t<CPUBackend> &ws) {
   const auto &input = ws.InputRef<CPUBackend>(0);
   auto &output = ws.OutputRef<CPUBackend>(0);
   auto in_shape = input.shape();
-  int nsamples = input.size();
   auto& thread_pool = ws.GetThreadPool();
 
   TYPE_SWITCH(input.type().id(), type2id, T, (float), (
