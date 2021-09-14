@@ -202,7 +202,7 @@ class DLTensorPythonFunctionImpl : public Operator<Backend> {
         auto inputs = detail::PrepareDLTensorInputsPerSample<Backend>(ws);
         py::list out_batch;
         if (inputs.size() > 0) {
-          for (auto &input_tuple : inputs) {
+          for (const auto &input_tuple : inputs) {
             py::object output = python_function(*input_tuple);
             if (!output.is_none()) out_batch.append(output);
           }
