@@ -256,14 +256,15 @@ endif()
 
 if (BUILD_WITH_ASAN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -fsanitize-address-use-after-scope")
-endif()
-
-if (BUILD_WITH_LSAN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=leak")
+  add_link_options(-fsanitize=address)
+  add_link_options(-lasan)
 endif()
 
 if (BUILD_WITH_UBSAN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
+  add_link_options(-fsanitize=undefined)
+  add_link_options(-lubsan)
 endif()
 
 if ("${ARCH}" STREQUAL "aarch64-linux")
