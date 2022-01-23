@@ -31,7 +31,6 @@ endif()
 set(DALI_ROOT ${PROJECT_SOURCE_DIR})
 set(CUDA_VERSION "${CMAKE_CUDA_COMPILER_VERSION}")
 
-check_cxx_compiler_flag(-fopenmp-simd CXX_HAVE_OMP_SIMD)
 
 # Build options
 option(BUILD_DALI_NODEPS "Disable components that require extra external libraries to be present in the system. Effectively, it builds only the DALI core and kernel libraries")
@@ -288,10 +287,9 @@ endif()
 message(STATUS "CUDA Compiler: ${CMAKE_CUDA_COMPILER}")
 
 # OpenMP SIMD support
-if(CXX_HAVE_OMP_SIMD)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp-simd")
-else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+find_package(OpenMP REQUIRED)
+if(OpenMP_FOUND)
+  list(APPEND DALI_LIBS OpenMP::OpenMP_CXX)
 endif()
 
 # Add ptx & bin flags for cuda compiler (nvcc)
