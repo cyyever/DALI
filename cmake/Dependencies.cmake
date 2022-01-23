@@ -21,28 +21,16 @@ list(APPEND DALI_EXCLUDES libcudart_static.a)
 
 # For NVJPEG
 if (BUILD_NVJPEG)
-  find_package(NVJPEG 9.0 REQUIRED)
-  if(${CUDA_VERSION} VERSION_LESS ${NVJPEG_VERSION})
-    message(WARNING "Using nvJPEG ${NVJPEG_VERSION} together with CUDA ${CUDA_VERSION} "
-                    "requires NVIDIA drivers compatible with CUDA ${NVJPEG_VERSION} or later")
-  endif()
-  include_directories(SYSTEM ${NVJPEG_INCLUDE_DIR})
+  find_package(CUDAToolkit REQUIRED)
 
   # load using dlopen or link statically here
   if (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
-    list(APPEND DALI_LIBS ${NVJPEG_LIBRARY})
-    list(APPEND DALI_EXCLUDES libnvjpeg_static.a)
+    list(APPEND DALI_LIBS CUDA::nvjpeg_static)
   endif (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
 
-  add_definitions(-DDALI_USE_NVJPEG)
-
-  if (${NVJPEG_LIBRARY_0_2_0})
-    add_definitions(-DNVJPEG_LIBRARY_0_2_0)
-  endif()
-
-  if (${NVJPEG_PREALLOCATE_API})
-    add_definitions(-DNVJPEG_PREALLOCATE_API)
-  endif()
+  add_definitions(DALI_USE_NVJPEG)
+  add_definitions(NVJPEG_LIBRARY_0_2_0)
+  add_definitions(NVJPEG_PREALLOCATE_API)
 endif()
 
 if (BUILD_NVJPEG2K)
