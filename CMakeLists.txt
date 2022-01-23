@@ -30,8 +30,6 @@ endif()
 set(DALI_ROOT ${PROJECT_SOURCE_DIR})
 set(CUDA_VERSION "${CMAKE_CUDA_COMPILER_VERSION}")
 
-parse_cuda_version(${CUDA_VERSION} CUDA_VERSION_MAJOR CUDA_VERSION_MINOR CUDA_VERSION_PATCH CUDA_VERSION_SHORT CUDA_VERSION_SHORT_DIGIT_ONLY)
-
 check_cxx_compiler_flag(-fopenmp-simd CXX_HAVE_OMP_SIMD)
 
 # Build options
@@ -144,20 +142,6 @@ option(VERBOSE_LOGS "Adds verbose loging to DALI" OFF)
 option(WERROR "Treat all warnings as errors" OFF)
 option(RELWITHDEBINFO_CUDA_DEBUG "Add device side debug info for RelWithDebInfo build conifguration" OFF)
 
-cmake_dependent_option(DALI_CLANG_ONLY "Compile DALI using only Clang. Suitable only for developement."
-    OFF "CMAKE_CXX_COMPILER_ID STREQUAL Clang" OFF)
-
-if (DALI_CLANG_ONLY AND BUILD_NVDEC)
-  message(STATUS "NVDEC is not supportet when compiling only with Clang. Setting BUILD_NVDEC to OFF.")
-  set(BUILD_NVDEC OFF)
-endif()
-
-message(STATUS "DALI_CLANG_ONLY -- ${DALI_CLANG_ONLY}")
-
-if (NOT CMAKE_CUDA_COMPILER_ID STREQUAL "NVIDIA")
-  message(FATAL_ERROR "Expected CUDA compiler to be set to nvcc. Clang-only build is supported via DALI_CLANG_ONLY
-      which requires setting Clang as C and CXX compilers and leaving nvcc as CUDA compiler.")
-endif()
 
 # ; creates a list here
 set (PYTHON_VERSIONS "3.6;3.7;3.8;3.9;3.10")
@@ -279,32 +263,10 @@ endif()
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register -Wsign-compare")
 
-  # Settings specific to builds where Clang is used for compiling CUDA code
-  if (DALI_CLANG_ONLY)
-    # Enable SFINAE with ellipsis in device code
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -fcuda-allow-variadic-functions")
-
-    # TODO(klecki): Plethora of warnings that should be adressed as a followup
-    # std::abs have no effect on unsigned value in a templated call
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-absolute-value")
-    # convert.h when the bigger values are not representable
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-int-float-conversion")
-    # Some aggregate constructors with inner object suggest double braces
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-braces")
-    # Reductions do not cover all enum values
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch")
-    # TYPE_SWITCH over bool exists in the wild
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-bool")
-    # CUDA flags are passed to .cc files and are ignored
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")
-    # Ignore warnings coming from cutlass
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --system-header-prefix=cutlass/")
-  endif()
-
   # CUDA does not support current Clang as host compiler, we need use gcc
   # CMAKE_CUDA_HOST_COMPILER variable operates on paths
   set(CUDA_UNSUPPORTED_COMPILER 0)
-  if (NOT DALI_CLANG_ONLY AND NOT CMAKE_CUDA_HOST_COMPILER)
+  if (NOT CMAKE_CUDA_HOST_COMPILER)
     if ("${CMAKE_CUDA_HOST_COMPILER}" MATCHES "clang")
         set(CUDA_UNSUPPORTED_COMPILER 1)
     elseif (CMAKE_CUDA_HOST_COMPILER STREQUAL "")
@@ -328,55 +290,14 @@ endif()
 message(STATUS "CUDA Compiler: ${CMAKE_CUDA_COMPILER}")
 
 # OpenMP SIMD support
-if(CXX_HAVE_OMP_SIMD AND NOT DALI_CLANG_ONLY)
+if(CXX_HAVE_OMP_SIMD)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp-simd")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 endif()
 
-# Discover what architectures does nvcc support
-if (DALI_CLANG_ONLY)
-  set(USED_CUDA_COMPILER ${CMAKE_CXX_COMPILER})
-else()
-  set(USED_CUDA_COMPILER ${CMAKE_CUDA_COMPILER})
-endif()
-
-
-message(STATUS "CUDA .cu files compiler: ${USED_CUDA_COMPILER}")
-
-CUDA_find_supported_arch_values(CUDA_supported_archs ${USED_CUDA_COMPILER} ${CUDA_known_archs})
-message(STATUS "CUDA supported archs: ${CUDA_supported_archs}")
-
-set(CUDA_TARGET_ARCHS_SORTED ${CUDA_TARGET_ARCHS})
-list(SORT CUDA_TARGET_ARCHS_SORTED)
-CUDA_find_supported_arch_values(CUDA_targeted_archs ${USED_CUDA_COMPILER} ${CUDA_TARGET_ARCHS_SORTED})
-message(STATUS "CUDA targeted archs: ${CUDA_targeted_archs}")
-if (NOT CUDA_targeted_archs)
-  message(FATAL_ERROR "None of the provided CUDA architectures ({${CUDA_TARGET_ARCHS}})"
-      " is supported by ${USED_CUDA_COMPILER}, use one or more of: ${CUDA_supported_archs}")
-endif()
-
-
-# Add gpu-arch and toolkit flags for clang when compiling cuda (if used)
-if (DALI_CLANG_ONLY)
-  CUDA_get_gencode_args(CUDA_gencode_flags_clang ${USED_CUDA_COMPILER} ${CUDA_targeted_archs})
-  message(STATUS "Generated gencode flags for clang: ${CUDA_gencode_flags_clang}")
-  CUDA_get_toolkit_from_compiler(CUDA_TOOLKIT_PATH_VAR)
-  message(STATUS "Used CUDA toolkit: ${CUDA_TOOLKIT_PATH_VAR}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-cuda-version --cuda-path=${CUDA_TOOLKIT_PATH_VAR} ${CUDA_gencode_flags_clang}")
-endif()
-
 # Add ptx & bin flags for cuda compiler (nvcc)
-if(USE_CMAKE_CUDA_ARCHITECTURES)
-  CUDA_get_cmake_cuda_archs(CMAKE_CUDA_ARCHITECTURES ${CUDA_targeted_archs})
-  message(STATUS "Generated CMAKE_CUDA_ARCHITECTURES: ${CMAKE_CUDA_ARCHITECTURES}")
-else()
-  CUDA_get_gencode_args(CUDA_gencode_flags_nvcc ${CMAKE_CUDA_COMPILER} ${CUDA_targeted_archs})
-  message(STATUS "Generated gencode flags: ${CUDA_gencode_flags_nvcc}")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${CUDA_gencode_flags_nvcc}")
-endif()
-
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-options \"-fvisibility=hidden -Wno-free-nonheap-object\" --Wno-deprecated-gpu-targets -Xfatbin -compress-all")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compiler-options -fvisibility=hidden --Wno-deprecated-gpu-targets -Xfatbin -compress-all")
 
 # Include directories
 include_directories(
@@ -387,8 +308,6 @@ include_directories(
 add_custom_target("check")
 add_custom_target("check-gtest")
 add_dependencies("check" "check-gtest")
-
-CUDA_move_toolkit_include_dirs_to_end()
 
 # Project build
 add_subdirectory(dali)

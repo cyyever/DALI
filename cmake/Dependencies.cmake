@@ -28,9 +28,9 @@ if (BUILD_NVJPEG)
     list(APPEND DALI_LIBS CUDA::nvjpeg_static)
   endif (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
 
-  add_definitions(DALI_USE_NVJPEG)
-  add_definitions(NVJPEG_LIBRARY_0_2_0)
-  add_definitions(NVJPEG_PREALLOCATE_API)
+  add_compile_definitions(DALI_USE_NVJPEG)
+  add_compile_definitions(NVJPEG_LIBRARY_0_2_0)
+  add_compile_definitions(NVJPEG_PREALLOCATE_API)
 endif()
 
 if (BUILD_NVJPEG2K)
@@ -89,7 +89,7 @@ endif()
 
 # verbose
 if (VERBOSE_LOGS)
-  add_definitions(-DDALI_VERBOSE_LOGS)
+  add_compile_definitions(DALI_VERBOSE_LOGS)
 endif()
 
 
@@ -109,7 +109,7 @@ if (BUILD_PROTOBUF)
     message(STATUS "TensorFlow TFRecord file format support is not available with Protobuf 2")
   else()
     message(STATUS "Enabling TensorFlow TFRecord file format support")
-    add_definitions(-DDALI_BUILD_PROTO3=1)
+    add_compile_definitions(DALI_BUILD_PROTO3=1)
     set(BUILD_PROTO3 ON CACHE STRING "Build proto3")
   endif()
 

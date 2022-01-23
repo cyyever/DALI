@@ -65,7 +65,7 @@ if (BUILD_JPEG_TURBO)
   include_directories(${JPEG_INCLUDE_DIR})
   message("Using libjpeg-turbo at ${JPEG_LIBRARY}")
   list(APPEND DALI_LIBS ${JPEG_LIBRARY})
-  add_definitions(-DDALI_USE_JPEG_TURBO)
+  add_compile_definitions(DALI_USE_JPEG_TURBO)
 endif()
 
 ##################################################################
