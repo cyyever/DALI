@@ -82,8 +82,8 @@ endif()
 # PyBind
 ##################################################################
 if (BUILD_PYTHON)
-  set(PYBIND11_CPP_STANDARD -std=c++14)
-  check_and_add_cmake_submodule(${PROJECT_SOURCE_DIR}/third_party/pybind11)
+  find_package(pybind11 CONFIG REQUIRED)
+  list(APPEND DALI_LIBS pybind11::embed)
 endif()
 
 ##################################################################
