@@ -328,51 +328,21 @@ function(build_per_python_lib)
     target_include_directories(${PYTHON_LIB_ARG_TARGET_NAME}_private
                                INTERFACE "${PYBIND11_INCLUDE_DIR}"
                                INTERFACE "${pybind11_INCLUDE_DIR}")
+    set(PYTHON_LIB_TARGET_FOR_PYVER "${PYTHON_LIB_ARG_TARGET_NAME}_${Python3_VERSION}")
+    add_library(${PYTHON_LIB_TARGET_FOR_PYVER} SHARED)
 
-    foreach(PYVER ${PYTHON_VERSIONS})
+    set_target_properties(${PYTHON_LIB_TARGET_FOR_PYVER}
+                            PROPERTIES
+                            LIBRARY_OUTPUT_DIRECTORY ${PYTHON_LIB_ARG_OUTPUT_DIR}
+                            PREFIX "${PYTHON_LIB_ARG_PREFIX}"
+                            OUTPUT_NAME ${PYTHON_LIB_ARG_OUTPUT_NAME})
 
-        set(PYTHON_LIB_TARGET_FOR_PYVER "${PYTHON_LIB_ARG_TARGET_NAME}_${PYVER}")
-        # check if listed python versions are accesible
-        execute_process(
-            COMMAND python${PYVER}-config --help
-            RESULT_VARIABLE PYTHON_EXISTS OUTPUT_QUIET)
+    target_link_libraries(${PYTHON_LIB_TARGET_FOR_PYVER} PRIVATE Python3::Module)
+    # add interface dummy lib as a dependnecy to easilly propagate options we could set from the above
+    target_link_libraries(${PYTHON_LIB_TARGET_FOR_PYVER} PUBLIC ${PYTHON_LIB_ARG_TARGET_NAME}_public)
+    target_link_libraries(${PYTHON_LIB_TARGET_FOR_PYVER} PRIVATE ${PYTHON_LIB_ARG_TARGET_NAME}_private)
 
-        if (${PYTHON_EXISTS} EQUAL 0)
-            execute_process(
-                COMMAND python${PYVER}-config --extension-suffix
-                OUTPUT_VARIABLE PYTHON_SUFIX)
-            # remove newline and the extension
-            string(REPLACE ".so\n" "" PYTHON_SUFIX "${PYTHON_SUFIX}")
-
-            execute_process(
-                COMMAND python${PYVER}-config --includes
-                OUTPUT_VARIABLE PYTHON_INCLUDES)
-            # split and make it a list
-            string(REPLACE "-I" "" PYTHON_INCLUDES "${PYTHON_INCLUDES}")
-            string(REPLACE "\n" "" PYTHON_INCLUDES "${PYTHON_INCLUDES}")
-            separate_arguments(PYTHON_INCLUDES)
-
-            add_library(${PYTHON_LIB_TARGET_FOR_PYVER} SHARED)
-
-            set_target_properties(${PYTHON_LIB_TARGET_FOR_PYVER}
-                                    PROPERTIES
-                                    LIBRARY_OUTPUT_DIRECTORY ${PYTHON_LIB_ARG_OUTPUT_DIR}
-                                    PREFIX "${PYTHON_LIB_ARG_PREFIX}"
-                                    OUTPUT_NAME ${PYTHON_LIB_ARG_OUTPUT_NAME}${PYTHON_SUFIX})
-            # add includes
-            foreach(incl_dir ${PYTHON_INCLUDES})
-                target_include_directories(${PYTHON_LIB_TARGET_FOR_PYVER} PRIVATE ${incl_dir})
-            endforeach(incl_dir)
-
-            # add interface dummy lib as a dependnecy to easilly propagate options we could set from the above
-            target_link_libraries(${PYTHON_LIB_TARGET_FOR_PYVER} PUBLIC ${PYTHON_LIB_ARG_TARGET_NAME}_public)
-            target_link_libraries(${PYTHON_LIB_TARGET_FOR_PYVER} PRIVATE ${PYTHON_LIB_ARG_TARGET_NAME}_private)
-
-            add_dependencies(${PYTHON_LIB_ARG_TARGET_NAME} ${PYTHON_LIB_TARGET_FOR_PYVER})
-        endif()
-
-    endforeach(PYVER)
-
+    add_dependencies(${PYTHON_LIB_ARG_TARGET_NAME} ${PYTHON_LIB_TARGET_FOR_PYVER})
 endfunction()
 
 # get default compiler include paths, needed by the stub generator

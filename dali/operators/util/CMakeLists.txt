@@ -29,7 +29,7 @@ if (WITH_DYNAMIC_CUDA_TOOLKIT)
     set(NPP_GENERATED_STUB "${CMAKE_CURRENT_BINARY_DIR}/dynlink_npp_gen.cc")
     add_custom_command(
         OUTPUT ${NPP_GENERATED_STUB}
-        COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/../../../tools/stub_generator/stub_codegen.py --unique_prefix=Npp --
+        COMMAND Python3::Interpreter ${CMAKE_CURRENT_SOURCE_DIR}/../../../tools/stub_generator/stub_codegen.py --unique_prefix=Npp --
                     "${CMAKE_CURRENT_SOURCE_DIR}/../../../tools/stub_generator/npp.json" ${NPP_GENERATED_STUB}
                     "${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}/npp.h" "-I${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}"
                     # for some reason QNX fails with 'too many errors emitted' is this is not set

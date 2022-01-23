@@ -21,6 +21,7 @@ include(CMakeDependentOption)
 
 include(cmake/Utils.cmake)
 include(cmake/CUDA_utils.cmake)
+find_package(Python3 COMPONENTS Interpreter Development)
 
 if (POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW)
@@ -142,9 +143,6 @@ option(VERBOSE_LOGS "Adds verbose loging to DALI" OFF)
 option(WERROR "Treat all warnings as errors" OFF)
 option(RELWITHDEBINFO_CUDA_DEBUG "Add device side debug info for RelWithDebInfo build conifguration" OFF)
 
-
-# ; creates a list here
-set (PYTHON_VERSIONS "3.6;3.7;3.8;3.9;3.10")
 
 if (STATIC_LIBS)
   message (STATUS "Building static libraries")
