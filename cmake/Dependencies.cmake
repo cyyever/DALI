@@ -16,16 +16,20 @@
 # CUDA Toolkit libraries (including NVJPEG)
 ##################################################################
 
+find_package(CUDAToolkit REQUIRED)
 CUDA_find_library(CUDART_LIB cudart_static)
 list(APPEND DALI_EXCLUDES libcudart_static.a)
 
 # For NVJPEG
 if (BUILD_NVJPEG)
-  find_package(CUDAToolkit REQUIRED)
 
   # load using dlopen or link statically here
   if (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
-    list(APPEND DALI_LIBS CUDA::nvjpeg_static)
+    if(TARGET CUDA::nvjpeg_static)
+      list(APPEND DALI_LIBS CUDA::nvjpeg_static)
+    else()
+      list(APPEND DALI_LIBS CUDA::nvjpeg)
+    endif()
   endif (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
 
   add_compile_definitions(DALI_USE_NVJPEG)
@@ -66,9 +70,10 @@ endif ()
 
 # CULIBOS needed when using static CUDA libs
 if (NOT WITH_DYNAMIC_CUDA_TOOLKIT)
-  CUDA_find_library(CUDA_culibos_LIBRARY culibos)
-  list(APPEND DALI_LIBS ${CUDA_culibos_LIBRARY})
-  list(APPEND DALI_EXCLUDES libculibos.a)
+  if(TARGET CUDA::culibos)
+    list(APPEND DALI_LIBS CUDA::culibos)
+    list(APPEND DALI_EXCLUDES libculibos.a)
+  endif()
 endif()
 
 if (LINK_LIBCUDA)
