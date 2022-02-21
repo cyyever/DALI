@@ -124,7 +124,8 @@ if (BUILD_PROTOBUF)
   list(APPEND DALI_EXCLUDES libprotobuf.a)
 endif()
 
-set(DALI_SYSTEM_LIBS rt pthread m dl)
+find_package(Threads REQUIRED)
+set(DALI_SYSTEM_LIBS rt Threads::Threads m dl)
 list(APPEND DALI_LIBS ${CUDART_LIB} ${DALI_SYSTEM_LIBS})
 
 ##################################################################
