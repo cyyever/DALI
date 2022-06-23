@@ -318,7 +318,6 @@ TEST_P(ComplexFft1DCpuOtherLayoutTest, LayoutTest) {
   for (int d = in_strides.size()-2; d >= 0; d--) {
     in_strides[d] = in_strides[d+1] * in_shape[d+1];
   }
-  int64_t in_step = in_shape[args.transform_axis];
   int64_t in_stride = in_strides[args.transform_axis];
 
   TensorShape<> out_strides = out_shape;

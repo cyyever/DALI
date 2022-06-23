@@ -194,7 +194,6 @@ bool Pad<CPUBackend>::SetupImpl(std::vector<OutputDesc> &output_desc,
   auto in_layout = input.GetLayout();
   int ndim = in_shape.sample_dim();
   int nsamples = in_shape.num_samples();
-  auto nthreads = ws.GetThreadPool().NumThreads();
 
   ReadArguments(spec_, ws);
 
