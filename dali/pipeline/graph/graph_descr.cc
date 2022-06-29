@@ -268,7 +268,7 @@ void OpGraph::RemoveTensorNode(TensorNodeId id) {
                "Removed tensors cannot have any consumers.");
   auto removed_name = tensor_nodes_[id].name;
   // Swap it out
-  for (TensorNodeId i = id + 1; i < static_cast<int>(tensor_nodes_.size()); i++) {
+  for (TensorNodeId i = id + 1; i < tensor_nodes_.size(); i++) {
     // Move from i to i - 1
     SwapTensorNodes(i, i - 1);
   }
@@ -354,7 +354,7 @@ void OpGraph::RemoveOpNode(OpNodeId id) {
   DALI_ENFORCE(target_op.children_tensors.empty(),
                "All produced tensors should be removed before removing op"
                " and list of children tensors should be invalidated.");
-  for (OpNodeId i = id + 1; i < static_cast<int>(op_nodes_.size()); i++) {
+  for (OpNodeId i = id + 1; i < op_nodes_.size(); i++) {
     // Move from i to i - 1
     SwapOpNodes(i - 1, i);
   }

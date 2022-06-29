@@ -99,7 +99,7 @@ Image::Shape PngImage::PeekShapeImpl(const uint8_t *encoded_buffer, size_t lengt
     png_dimens = encoded_buffer;
   }
 
-  DALI_ENFORCE(static_cast<int>(length) >= png_dimens - encoded_buffer + 16u);
+  DALI_ENFORCE(length >= png_dimens - encoded_buffer + 16u);
 
   const int64_t W = ReadWidth(png_dimens);
   const int64_t H = ReadHeight(png_dimens);
